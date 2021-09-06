@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Word Memorization Training</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<meta name="mobile-web-app-capable" content="yes">
+		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+
+		<section class="page home">
+			<div class="heading-wrapper">
+				<h1>Word Memorization Training</h1>
+				<p>Memorize all the words by making a story that connects each word in sequence.</p>
+			</div>
+			<div class="level">Level <span class="level-var">N</span></div>
+			<p>If you are ready click <button onclick="startGame();changePage(memorizePage);">Start</button></p>  
+		</section>
+		
+		<section class="page memorize">
+			<div class="level">Level <span class="level-var">1</span></div>
+			<div class="word-to-memorize-wrapper">
+				<h2 id="word-var">[[word]]</h2>
+				<p>Once finished click <button onclick="nextWordToMemorize();">Next</button></p>
+			</div>
+			<div class="position">
+				<span class="position-var">N</span> / <span class="words-length-var">N</span>
+			</div>
+		</section>
+		
+		<section class="page search-words">
+			<div class="search-wrapper">
+				<input list="words" id="search" placeholder="Search the words" onchange="addMemorizedWord();">
+				<button onclick="addMemorizedWord();">Add</button>
+				<datalist id="words"></datalist>
+			</div>
+			<div class="memo-list-header">
+				<h3>Memo List</h3>
+				<p>Once you are done click <button onclick="calcResults();changePage(gameResultsPage);">Continue</button></p>
+			</div>
+			<ul id="memo-list"></ul>
+		</section>
+		
+		<section class="page game-results">
+			<p class="scores">You got <span class="remembered-var">N</span> words right, of which <span class="remembered-in-order-var">N</span> in order.</p>
+			<p class="message-var">[[message]]</p>
+			<p>Go back to <button onclick="changePage(homePage);">Home</button></p>
+		</section>		
+		
+		<script src="main.js"></script>
+	</body>
+</html>
