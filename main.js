@@ -2484,8 +2484,8 @@ let verbs = [
     "classify"
 ];
 
-// Load words into the search datalist
-[...nouns, ...verbs]
+// Dedupe and sort then load words into the search datalist
+[...new Set([...nouns, ...verbs])]
   .sort((a, b) => a.localeCompare(b))
   .forEach(word => {
     let option = document.createElement("OPTION");
