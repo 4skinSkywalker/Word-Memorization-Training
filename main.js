@@ -43,7 +43,7 @@ function createDatalist(containerId, inputId, listId, data) {
       filteredData = [];
     } else {
       filteredData = data.filter(el =>
-        new RegExp(input.value).test(el)
+        new RegExp(input.value, "i").test(el)
       );
     }
     renderList();
@@ -2645,3 +2645,4 @@ let datalist = createDatalist(
 );
 
 datalist.addSelectionListener(addMemorizedWord);
+  
