@@ -125,13 +125,18 @@ function makeDraggable(el) {
         let children = [...parent.children];
         let elIndex = children.indexOf(el);
         let collidingIndex = children.indexOf(colliding);
-        [
-          children[elIndex],
-          children[collidingIndex]
-        ] = [
-          children[collidingIndex],
-          children[elIndex]
-        ];
+        children[elIndex] = null;
+        console.log(children);
+        if (elIndex < collidingIndex) {
+          for (let i = elIndex + 1; i <= collidingIndex; i++) {
+            children[i-1] = children[i];
+          }
+        } else {
+          for (let i = elIndex; i >= collidingIndex; i--) {
+            children[i] = children[i-1];
+          }
+        }
+        children[collidingIndex] = el;
         parent.innerHTML = "";
         children.forEach(child => parent.appendChild(child));
       }
@@ -2645,4 +2650,3 @@ let datalist = createDatalist(
 );
 
 datalist.addSelectionListener(addMemorizedWord);
-  
