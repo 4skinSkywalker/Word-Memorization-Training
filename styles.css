@@ -121,16 +121,6 @@ button, input {
   justify-content: start;
 }
 
-.page.search-words .search-wrapper {
-    display: flex;
-    gap: 1em;
-    margin-bottom: 5em;
-}
-
-#search {
-  text-align: right;
-}
-
 .page.search-words .memo-list-header {
   display: flex;
   justify-content: space-between;
@@ -140,11 +130,6 @@ button, input {
 }
 
 @media (max-width: 720px) {
-  .page.search-words .search-wrapper {
-    text-align: left;
-    margin-bottom: 2em;
-  }
-  
   .memo-list-header h3 {
     display: none;
   }
@@ -159,6 +144,7 @@ button, input {
   border: 1px solid;
   border-radius: 1em;
   overflow: auto;
+  user-select: none;
 }
 
 #memo-list .memo-list-item {
@@ -169,11 +155,6 @@ button, input {
   border: 1px solid;
   border-radius: .5em;
   cursor: pointer;
-}
-
-.page.search-words .memo-list-item input {
-  width: 5ch;
-  text-align: right;
 }
 /* /page search-words */
 
@@ -190,3 +171,48 @@ button, input {
   font-size: var(--primary-text-size);
 }
 /* / page game-results */
+
+/* custom datalist */
+#search-container {
+  position: relative;
+  margin-bottom: 5em;
+  text-align: left;
+}
+
+@media (max-width: 720px) {
+  #search-container {
+    margin-bottom: 2em;  
+  }
+}
+
+#search-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 15em;
+  margin-top: .5em;
+  padding: 1em .5em;
+  list-style: none;
+  border: 1px solid;
+  border-radius: 1em;
+  background-color: #333;
+  overflow: auto;
+}
+
+#search-results.active {
+  display: block;
+}
+
+#search-results li {
+  padding: .25em 1em;
+  border: 1px solid;
+  border-radius: 1em;
+  cursor: pointer;
+}
+
+#search-results li:not(:last-of-type) {
+  margin-bottom: .25em;
+}
+/* / custom datalist */

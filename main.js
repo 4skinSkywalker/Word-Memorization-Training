@@ -1,15 +1,167 @@
+// custom datalist
+function createDatalist(containerId, inputId, listId, data) {
+  let container = document.querySelector(containerId);
+  let input = document.querySelector(inputId);
+  let list = document.querySelector(listId);
+  
+  let filteredData = [...data];
+  let listeners = [];
+  
+  function addSelectionListener(fn) {
+    listeners.push(fn);
+  }
+  
+  function select(data) {
+    listeners.forEach(fn => fn(data));
+  }
+  
+  function renderList() {
+    list.innerHTML = "";
+    for (let data of filteredData) {
+      let li = document.createElement("LI");
+      li.innerText = data;
+      li.addEventListener("click", () => {
+        input.value = data;
+        select(data);
+      });
+      list.appendChild(li);
+    }
+    if (filteredData.length) {
+      list.classList.add("active");
+    } else {
+      list.classList.remove("active");
+    }
+  }
+  
+  function clean() {
+    filteredData = [];
+    renderList();
+  }
+  
+  input.addEventListener("input", () => {
+    if (input.value === "") {
+      filteredData = [];
+    } else {
+      filteredData = data.filter(el =>
+        new RegExp(input.value).test(el)
+      );
+    }
+    renderList();
+  });
+  
+  return {
+    addSelectionListener,
+    clean
+  };
+}
+// / custom datalist
+
+function makeDraggable(el) {
+  let CUSTOM_CLASS = "draggable";
+  let ACTIVE_CLASS = "dragging"
+  el.classList.add(CUSTOM_CLASS);
+  el.addEventListener("mousedown", mdHandler);
+  el.addEventListener("touchstart", mdHandler);
+  
+  function mdHandler(mdevt) {
+    let {x, y, width, height} = el.getBoundingClientRect();
+    let originX = x;
+    let originY = y;
+    
+    el.classList.add(ACTIVE_CLASS);
+    el.style.position = "relative";
+    
+    let draggables = [...document.querySelectorAll(`.${CUSTOM_CLASS}`)];
+    let inactiveDraggables = draggables
+      .filter(draggable => !draggable.classList.contains(ACTIVE_CLASS));
+    
+    let colliding;
+    function mmHandler(mmevt) {
+      
+      let pointerX;
+      let pointerY;
+      if ("changedTouches" in mmevt) {
+        pointerX = mmevt.changedTouches[0].pageX;
+        pointerY = mmevt.changedTouches[0].pageY;
+      } else {
+        pointerX = mmevt.pageX;
+        pointerY = mmevt.pageY;
+      }
+      
+      colliding = inactiveDraggables.filter(draggable => {
+        let {x, y, width, height} = draggable.getBoundingClientRect();
+        return pointerX > x
+            && pointerX < x + width
+            && pointerY > y
+            && pointerY < y + height;
+      })[0];
+      
+      draggables.forEach(draggable =>
+        draggable.style.removeProperty("opacity")
+      );
+      
+      if (colliding) {
+        colliding.style.opacity = ".5";
+      }
+      
+      el.style.top = (pointerY - originY) + "px";
+      el.style.left = (pointerX - originX) + "px";
+      el.style.transform = "translate(-50%, -50%)";
+    }
+    
+    function muHandler(muevt) {
+      el.classList.remove(ACTIVE_CLASS);
+      el.style.removeProperty("position");
+      el.style.removeProperty("top");
+      el.style.removeProperty("left");
+      el.style.removeProperty("transform");
+      
+      draggables.forEach(draggable =>
+        draggable.style.removeProperty("opacity")
+      );
+      
+      if (colliding) {
+        let parent = el.parentNode;
+        let children = [...parent.children];
+        let elIndex = children.indexOf(el);
+        let collidingIndex = children.indexOf(colliding);
+        [
+          children[elIndex],
+          children[collidingIndex]
+        ] = [
+          children[collidingIndex],
+          children[elIndex]
+        ];
+        parent.innerHTML = "";
+        children.forEach(child => parent.appendChild(child));
+      }
+      
+      document.removeEventListener("mousemove", mmHandler);
+      document.removeEventListener("mouseup", muHandler);
+      document.removeEventListener("touchmove", mmHandler);
+      document.removeEventListener("touchend", muHandler);
+    }
+    
+    document.addEventListener("mousemove", mmHandler);
+    document.addEventListener("mouseup", muHandler);
+    document.addEventListener("touchmove", mmHandler);
+    document.addEventListener("touchend", muHandler);
+  }
+}
+
 let homePage = document.querySelector(".page.home");
 let memorizePage = document.querySelector(".page.memorize");
 let searchWordsPage = document.querySelector(".page.search-words");
 let gameResultsPage = document.querySelector(".page.game-results");
-let wordsDatalist = document.querySelector("#words");
-let memoList = document.querySelector("#memo-list");
 console.log(homePage, memorizePage, searchWordsPage, gameResultsPage);
+
+let searchInput = document.querySelector("#search-input");
+let memoList = document.querySelector("#memo-list");
 
 let levelVars = [...document.querySelectorAll(".level-var")];
 let wordVar = document.querySelector("#word-var");
 let positionVar = document.querySelector(".position-var");
-let wordsLengthVar = document.querySelector(".words-length-var");
+let wordsLengthVars = [...document.querySelectorAll(".words-length-var")];
 let rememberedVar = document.querySelector(".remembered-var");
 let rememberedInOrderVar = document.querySelector(".remembered-in-order-var");
 let messageVar = document.querySelector(".message-var");
@@ -19,7 +171,6 @@ levelVars.forEach(l => l.textContent = level);
 
 let index = 1;
 let wordsToMemorize;
-let memorizedWords;
 
 function localStorageLevel(update) {
   if (update) {
@@ -46,8 +197,7 @@ function changePage(page) {
 function startGame() {
   index = 1;
   wordsToMemorize = [];
-  memorizedWords = [];
-  renderMemorizedWords(); // Just to give it a clean
+  memoList.innerHTML = "";
   
   let numOfWords = 3 + level * 2;
   for (let i = 0; i < numOfWords; i++) {
@@ -60,7 +210,9 @@ function startGame() {
   console.log(wordsToMemorize);
   wordVar.innerText = wordsToMemorize[index - 1];
   positionVar.innerText = index;
-  wordsLengthVar.innerText = wordsToMemorize.length;
+  wordsLengthVars.forEach(wordsLengthVar =>
+    wordsLengthVar.innerText = wordsToMemorize.length
+  );
 }
 
 function nextWordToMemorize() {
@@ -74,35 +226,32 @@ function nextWordToMemorize() {
   positionVar.innerText = index;
 }
 
-function addMemorizedWord() {
-  if (![...nouns, ...verbs].includes(search.value)) {
-    return;
-  }
-  memorizedWords.push(search.value);
-  search.value = "";
-  search.focus();
-  renderMemorizedWords();
-}
-
-function renderMemorizedWords() {
-  memoList.innerHTML = "";
-  for (let index in memorizedWords) {
-    let div = document.createElement("DIV");
-    div.innerHTML = `<li class="memo-list-item">
-  ${memorizedWords[index]}
-  <button>x</button>
-</li>`;
-    div.querySelector("button")
-      .addEventListener("click", () => {
-        memorizedWords.splice(index, 1);
-        renderMemorizedWords();
-      });
-    memoList.appendChild(div.firstElementChild);
-  }
+function addMemorizedWord(word) {
+  let li = document.createElement("LI");
+  li.classList.add("memo-list-item");
+  let span = document.createElement("SPAN");
+  span.classList.add("word-node");
+  span.innerText = word;
+  li.appendChild(span);
+  let button = document.createElement("BUTTON");
+  button.addEventListener("click", evt =>
+    memoList.removeChild(evt.target.parentElement)
+  );
+  button.innerText = "x";
+  button.style.marginLeft = ".25em";
+  li.appendChild(button);
+  makeDraggable(li);
+  memoList.appendChild(li);
+  datalist.clean();
+  searchInput.value = "";
+  searchInput.focus();
 }
 
 function calcResults() {
   let remembered = 0;
+  let memorizedWords = [...memoList.querySelectorAll(".word-node")]
+    .map(wordNode => wordNode.innerText);
+  console.log(memorizedWords);
   for (let word of memorizedWords) {
     if (wordsToMemorize.includes(word)) {
       remembered++;
@@ -117,7 +266,7 @@ function calcResults() {
   rememberedVar.innerText = remembered;
   rememberedInOrderVar.innerText = rememberedInOrder;
   let message;
-  if (remembered > 0.8 * wordsToMemorize.length) {
+  if (remembered >= 0.8 * wordsToMemorize.length) {
     message = `Congratulations!<br>Level increased to ${++level}`;
   } else if (remembered < 0.4 * wordsToMemorize.length && level > 1) {
     message = `Level decreased to ${--level}`;
@@ -2485,11 +2634,14 @@ let verbs = [
 ];
 
 // Dedupe and sort then load words into the search datalist
-[...new Set([...nouns, ...verbs])]
-  .sort((a, b) => a.localeCompare(b))
-  .forEach(word => {
-    let option = document.createElement("OPTION");
-    option.value = word;
-    wordsDatalist.appendChild(option);
-  });
-  
+let words = [...new Set([...nouns, ...verbs])]
+  .sort((a, b) => a.localeCompare(b));
+
+let datalist = createDatalist(
+  "#search-container",
+  "#search-input",
+  "#search-results",
+  words
+);
+
+datalist.addSelectionListener(addMemorizedWord);

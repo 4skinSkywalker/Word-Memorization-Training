@@ -31,10 +31,12 @@
 		</section>
 		
 		<section class="page search-words">
-			<div class="search-wrapper">
-				<input list="words" id="search" placeholder="Search the words" onchange="addMemorizedWord();">
-				<button onclick="addMemorizedWord();">Add</button>
-				<datalist id="words"></datalist>
+			<div id="search-container">
+				<input
+					id="search-input"
+					placeholder="Search the words"
+				>
+				<ul id="search-results"></ul>
 			</div>
 			<div class="memo-list-header">
 				<h3>Memo List</h3>
@@ -44,7 +46,7 @@
 		</section>
 		
 		<section class="page game-results">
-			<p class="scores">You got <span class="remembered-var">N</span> words right, of which <span class="remembered-in-order-var">N</span> in order.</p>
+			<p class="scores">You got <span class="remembered-var">N</span> / <span class="words-length-var">N</span> words correct, of which <span class="remembered-in-order-var">N</span> in the right order.</p>
 			<p class="message-var">[[message]]</p>
 			<p>Go back to <button onclick="changePage(homePage);">Home</button></p>
 		</section>		
