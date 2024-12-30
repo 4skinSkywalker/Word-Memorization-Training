@@ -286,10 +286,10 @@ function calcResults() {
   });
   wordsToRememberVar.innerHTML = "The sequence was " + highlightedWords.join(", ");
   let message;
-  if (remembered >= 0.8 * wordsToMemorize.length) {
-    message = `Congratulations!<br>Level increased to ${++level}`;
-  } else if (remembered < 0.4 * wordsToMemorize.length && level > 1) {
-    message = `Level decreased to ${--level}`;
+  if (remembered === wordsToMemorize.length) {
+    message = `Congratulations!<br>Level increased to ${++level}.`;
+  } else if (remembered < 0.5 * wordsToMemorize.length && level > 1) {
+    message = `Level decreased to ${--level}.`;
   } else {
     message = "Level remains the same.<br>Keep up.";
   }
