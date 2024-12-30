@@ -169,6 +169,7 @@ let positionVar = document.querySelector(".position-var");
 let wordsLengthVars = [...document.querySelectorAll(".words-length-var")];
 let rememberedVar = document.querySelector(".remembered-var");
 let rememberedInOrderVar = document.querySelector(".remembered-in-order-var");
+let wordsToRememberVar = document.querySelector(".words-to-remember-var");
 let messageVar = document.querySelector(".message-var");
 
 let level = localStorageLevel();
@@ -265,18 +266,25 @@ function calcResults() {
   let rememberedInOrder = 0;
   let memoCount = [];
   for (let i = 0; i < wordsToMemorize.length; i++) {
-    let currMemoCount = 1;
+    let currMemoCount = 0;
     for (let j = 0; j < memorizedWords.length; j++) {
-      if (wordsToMemorize[i] === memorizedWords[j]) {
+      if (wordsToMemorize[j] === memorizedWords[j]) {
         currMemoCount++;
       }
     }
     memoCount.push(currMemoCount);
   }
   rememberedInOrder = Math.max(...memoCount);
-  console.warn(rememberedInOrder);
   rememberedVar.innerText = remembered;
   rememberedInOrderVar.innerText = rememberedInOrder;
+  let highlightedWords = wordsToMemorize.map(w => {
+    const titlecase = w => w[0].toUpperCase() + w.slice(1, w.length);
+    if (memorizedWords.includes(w)) {
+      return `<span class="word-right">${titlecase(w)}</span>`;
+    }
+    return `<span class="word-wrong">${titlecase(w)}</span>`;
+  });
+  wordsToRememberVar.innerHTML = "The sequence was " + highlightedWords.join(", ");
   let message;
   if (remembered >= 0.8 * wordsToMemorize.length) {
     message = `Congratulations!<br>Level increased to ${++level}`;

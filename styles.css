@@ -84,6 +84,14 @@ button, input {
   }
 }
 
+.word-right {
+  color: lightgreen;
+}
+
+.word-wrong {
+  color: red;
+}
+
 /* page home */
 .page.home {
   gap: 5em;
