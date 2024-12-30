@@ -205,7 +205,7 @@ function startGame() {
   wordsToMemorize = [];
   memoList.innerHTML = "";
   
-  let numOfWords = 1 + level * 2;
+  let numOfWords = 3 + level;
   for (let i = 0; i < numOfWords; i++) {
     if (Math.random() < 0.25) {
       wordsToMemorize.push(verbs[Math.floor(Math.random() * verbs.length)]);
