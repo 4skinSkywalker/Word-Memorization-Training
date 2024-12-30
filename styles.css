@@ -70,7 +70,7 @@ button, input {
   justify-content: center;
   align-items: center;
   max-width: 720px;
-  height: 100vh;
+  height: 100svh;
   margin: 0 auto;
   padding: 2em;
   text-align: center;

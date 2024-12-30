@@ -263,11 +263,18 @@ function calcResults() {
     }
   }
   let rememberedInOrder = 0;
-  for (let index in wordsToMemorize) {
-    if (wordsToMemorize[index] === memorizedWords[index]) {
-      rememberedInOrder++;
+  let memoCount = [];
+  for (let i = 0; i < wordsToMemorize.length; i++) {
+    let currMemoCount = 1;
+    for (let j = 0; j < memorizedWords.length; j++) {
+      if (wordsToMemorize[i] === memorizedWords[j]) {
+        currMemoCount++;
+      }
     }
+    memoCount.push(currMemoCount);
   }
+  rememberedInOrder = Math.max(...memoCount);
+  console.warn(rememberedInOrder);
   rememberedVar.innerText = remembered;
   rememberedInOrderVar.innerText = rememberedInOrder;
   let message;
